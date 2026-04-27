@@ -4,6 +4,8 @@ pragma solidity ^0.8.24;
 
 import {MinimalAccount} from "src/MinimalAccount.sol";
 import {Script} from "forge-std/Script.sol";
+import {EntryPoint} from "@account-abstraction/core/EntryPoint.sol";
+import {IEntryPoint} from "@account-abstraction/interfaces/IEntryPoint.sol";
 
 contract HelperConfig is Script {
     error HelperConfig__ChainNotSupported();
@@ -18,12 +20,14 @@ contract HelperConfig is Script {
     uint256 public constant LOCALHOST_CHAIN_ID = 31337;
 
     address constant BURNER_WALLET = 0x0Bc7b3Cb8d0c356c30BfDba1B8d32caDDA5429Fc;
+    address public constant FOUNDRY_DEFAULT_ADDRESS = 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38;
+    address public constant ANVIL_DEFAULT_ADDRESS = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
     NetworkConfig public activenetworkConfig;
 
     constructor() {}
 
-    function getActiveNetworkConfig() public view returns (NetworkConfig memory networkConfig) {
+    function getActiveNetworkConfig() public returns (NetworkConfig memory networkConfig) {
         if (block.chainid == SEPOLIA_CHAIN_ID) {
             return getSepoliaEthConfig();
         } else if (block.chainid == ZKSYNC_CHAIN_ID) {
@@ -47,8 +51,14 @@ contract HelperConfig is Script {
         return zkSyncConfig;
     }
 
-    function getLocalhostConfig() public pure returns (NetworkConfig memory networkConfig) {
-        if (networkConfig.account == address(0)) {}
+    function getLocalhostConfig() public returns (NetworkConfig memory localnetworkConfig) {
+        if (localnetworkConfig.account == address(0)) {
+            vm.startBroadcast();
+            EntryPoint entrypoint = new EntryPoint();
+            vm.stopBroadcast();
+            localnetworkConfig = NetworkConfig({entrypoint: address(entrypoint), account: ANVIL_DEFAULT_ADDRESS});
+        }
+        return localnetworkConfig;
     }
 }
 
