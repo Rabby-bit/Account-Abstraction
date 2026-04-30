@@ -28,7 +28,7 @@ contract MinimalAccountTest is Test {
         helperConfig = new HelperConfig();
         helperconfig = helperConfig.getActiveNetworkConfig();
 
-        vm.prank(helperconfig.account);
+        vm.prank(ANVIL_DEFAULT_ADDRESS);
         deployscript = new DeployScript();
         (minimalaccount, helperconfig) = deployscript.run();
         sendUserOperation = new SendUserOperation();
@@ -60,32 +60,32 @@ contract MinimalAccountTest is Test {
         minimalaccount.execute(address(usdc), 0, functionData);
     }
 
-    // function test__validateUserOpTest() public {
-    //     //Arrange
-    //     ERC20Mock usdc = new ERC20Mock();
-    //     vm.deal(address(minimalaccount ), 10e18);
-    //     address entrypoint = helperconfig.entrypoint;
-    //     address account = helperconfig.account;
-    //     uint256 missingAccountFunds = 1e18;
-    //     uint256 nonce = vm.getNonce(address(minimalaccount));
+    function test__validateUserOpTest() public {
+        //Arrange
+        ERC20Mock usdc = new ERC20Mock();
+        vm.deal(address(minimalaccount), 10e18);
+        address entrypoint = helperconfig.entrypoint;
+        address account = address(minimalaccount);
+        uint256 missingAccountFunds = 1e18;
+        // uint256 nonce = vm.getNonce(address(minimalaccount));
 
-    //     bytes memory functionData = abi.encodeWithSelector(usdc.mint.selector, address(usdc), 1);
-    //     bytes memory callData = abi.encodeWithSelector(minimalaccount.execute.selector,address(usdc),0,functionData);
-    //     PackedUserOperation memory userOp = sendUserOperation.generateUserOperation(callData,  helperconfig, address(minimalaccount));
+        bytes memory functionData = abi.encodeWithSelector(usdc.mint.selector, address(usdc), 1);
+        bytes memory callData = abi.encodeWithSelector(minimalaccount.execute.selector, address(usdc), 0, functionData);
+        PackedUserOperation memory userOp = sendUserOperation.generateUserOperation(callData, helperconfig, account);
+        console.log("minimal account", address(minimalaccount));
 
-    //     bytes32 userOpHash = IEntryPoint(entrypoint).getUserOpHash(userOp);
+        bytes32 userOpHash = IEntryPoint(entrypoint).getUserOpHash(userOp);
 
-    //     // bytes32 userOpHash = entrypoint.getUserOpHash(userOp);
-    //     // uint256 missingAccountFunds = 1e18;
+        // bytes32 userOpHash = entrypoint.getUserOpHash(userOp);
+        // uint256 missingAccountFunds = 1e18;
 
-    //     //Act
-    //     vm.prank(entrypoint);
-    //     uint256 validationData = minimalaccount.validateUserOp( userOp,userOpHash,missingAccountFunds);
-    //     console.log("owner: ", minimalaccount.owner());
-    //     console.log("expected account: ", helperconfig.account);
-    //     console.log("validationData: ", validationData);
+        //Act
+        vm.prank(entrypoint);
+        uint256 validationData = minimalaccount.validateUserOp(userOp, userOpHash, missingAccountFunds);
+        console.log("owner: ", minimalaccount.owner());
+        console.log("validationData: ", validationData);
 
-    //     //Assert
-    //     assertEq(validationData, SIG_VALIDATION_SUCCESS);
-    // }
+        //Assert
+        assertEq(validationData, SIG_VALIDATION_SUCCESS);
+    }
 }

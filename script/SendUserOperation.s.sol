@@ -15,15 +15,15 @@ contract SendUserOperation is Script {
         0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
     function run() public {}
 
-    function generateUserOperation(
-        bytes memory callData,
-        HelperConfig.NetworkConfig memory config,
-        address minimalaccount
-    ) public view returns (PackedUserOperation memory) {
-        uint256 nonce = vm.getNonce(minimalaccount) - 1;
+    function generateUserOperation(bytes memory callData, HelperConfig.NetworkConfig memory config, address account)
+        public
+        view
+        returns (PackedUserOperation memory)
+    {
+        uint256 nonce = vm.getNonce(account) - 1;
         address entrypoint = config.entrypoint;
         //Generate unsign
-        PackedUserOperation memory userOp = _generateUnSignedOperation(callData, nonce, minimalaccount);
+        PackedUserOperation memory userOp = _generateUnSignedOperation(callData, nonce, account);
         bytes32 userOpHash = IEntryPoint(entrypoint).getUserOpHash(userOp);
         uint8 v;
         bytes32 r;
@@ -41,7 +41,7 @@ contract SendUserOperation is Script {
         return userOp;
     }
 
-    function _generateUnSignedOperation(bytes memory callData, uint256 nonce, address minimalaccount)
+    function _generateUnSignedOperation(bytes memory callData, uint256 nonce, address account)
         internal
         pure
         returns (PackedUserOperation memory packedUserOp)
@@ -55,7 +55,7 @@ contract SendUserOperation is Script {
 
         uint256 preVerificationGas = 1677777716;
         return packedUserOp = PackedUserOperation({
-            sender: minimalaccount,
+            sender: account,
             nonce: nonce,
             initCode: hex"",
             callData: callData,

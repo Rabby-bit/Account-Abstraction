@@ -1,0 +1,4 @@
+forge build src/zkSyncMinimal.sol --zksync --system-mode=true
+new one : forge build src/zkMinimalAccount.sol --zksync --system-mode=true
+
+ forge test test/zkMinimalAccountTest.t.sol --zksync --system-mode=true --via-ir -vvvvv

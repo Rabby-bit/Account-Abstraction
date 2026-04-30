@@ -61,17 +61,7 @@ contract MinimalAccount is IAccount, Ownable {
         view
         returns (uint256 validationData)
     {
-        bytes32 name = keccak256(bytes("Biyyah's Wallet"));
-        bytes32 version = keccak256(bytes("Version 1"));
-        uint256 chainId = block.chainid;
-        address verifyingContract = address(this);
-        //toTypedDataHash(bytes32 domainSeparator, bytes32 structHash)
-        bytes32 domainSeperator = keccak256(abi.encode(TYPE_HASH, name, version, chainId, verifyingContract));
-
-        bytes32 digest = MessageHashUtils.toTypedDataHash(domainSeperator, userOpHash);
-        bytes memory signature = userOp.signature;
-
-        address signer = ECDSA.recover(digest, signature);
+        address signer = ECDSA.recover(userOpHash, userOp.signature);
 
         if (signer == address(0) || signer != owner()) {
             return SIG_VALIDATION_FAILED;

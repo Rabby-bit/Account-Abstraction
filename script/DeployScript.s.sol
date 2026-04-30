@@ -14,9 +14,9 @@ contract DeployScript is Script {
 
         vm.startBroadcast(activeNetworkConfig.account);
         MinimalAccount minimalAccount = new MinimalAccount(activeNetworkConfig.entrypoint);
-        if (minimalAccount.owner() != msg.sender) {
-            minimalAccount.transferOwnership(msg.sender);
-        }
+        // if (minimalAccount.owner() != msg.sender) {
+        //     minimalAccount.transferOwnership(msg.sender);
+        // }
         vm.stopBroadcast();
 
         return (minimalAccount, activeNetworkConfig);
